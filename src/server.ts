@@ -1,4 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
+import 'reflect-metadata';
+import express, { Request, Response, NextFunction, Express } from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
 import { config } from './config/config';
@@ -6,8 +7,15 @@ import Logging from './library/Logging';
 import authorRoutes from './routes/Author.routes';
 import bookRoutes from './routes/Book.routes';
 import userRoutes from './routes/User.routes';
+import { ApolloServer } from 'apollo-server-express';
+import { buildSchema } from 'type-graphql';
+import { TaskResolver } from './apollo/resolvers/Task.resolver';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import appDataSource from './apollo/AppDataSource';
 
-const router = express();
+const app: Express = express();
+
+//TODO: Update all models to GraphQL TypeORM model and commit in graphql-test branch
 
 /** Connect to Mongo */
 mongoose
@@ -21,9 +29,33 @@ mongoose
     Logging.error(error);
   });
 
-/** Only start the server of mongo connects */
-const StartServer = () => {
-  router.use((req: Request, res: Response, next: NextFunction) => {
+/** Only start the server of Mongo connects */
+
+const StartServer = async () => {
+  /** Initializing Mongo TypeORM */
+  appDataSource
+    .initialize()
+    .then(() => {
+      Logging.info('<--Mongo TypeORM Initialized-->');
+    })
+    .catch((err) => {
+      Logging.error(`<--Error Initializing Mongo TypeORM--> :${err}`);
+    });
+
+  /** Apollo Server Configurations */
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [TaskResolver],
+      validate: false,
+    }),
+    introspection: true,
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+  });
+
+  await apolloServer.start();
+  apolloServer.applyMiddleware({ app });
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
     /** Log the Request */
     Logging.info(
       `Incoming --> Method : [${req.method}] - Url: [${req.url}] - IP: [${req.socket.remoteAddress}]`
@@ -39,11 +71,11 @@ const StartServer = () => {
     next();
   });
 
-  router.use(express.urlencoded({ extended: true }));
-  router.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json());
 
   /** Rules of our API */
-  router.use((req: Request, res: Response, next: NextFunction) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header(
       'Access-Control-Allow-Headers',
@@ -59,17 +91,17 @@ const StartServer = () => {
   });
 
   /** Routes */
-  router.use('/authors', authorRoutes);
-  router.use('/books', bookRoutes);
-  router.use('/users', userRoutes);
+  app.use('/authors', authorRoutes);
+  app.use('/books', bookRoutes);
+  app.use('/users', userRoutes);
 
   /** Health check */
-  router.get('/ping', (req: Request, res: Response, next: NextFunction) =>
+  app.get('/ping', (req: Request, res: Response, next: NextFunction) =>
     res.status(200).json({ message: 'Testing!!!' })
   );
 
   /** Error Handling */
-  router.use((req: Request, res: Response, next: NextFunction) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     const error = new Error('<--Not Found-->');
     Logging.error(error);
 
@@ -77,7 +109,7 @@ const StartServer = () => {
   });
 
   http
-    .createServer(router)
+    .createServer(app)
     .listen(config.server.port, () =>
       Logging.info(`<-- Server is running on PORT: ${config.server.port} -->`)
     );
