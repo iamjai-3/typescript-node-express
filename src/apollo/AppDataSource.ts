@@ -8,7 +8,11 @@ const appDataSource = new DataSource({
   useUnifiedTopology: true,
   synchronize: true,
   logging: true,
-  entities: ['src/apollo/entities/*.ts'],
+  entities: [
+    config.stage === 'development'
+      ? 'src/apollo/entities/*.ts'
+      : 'build/src/apollo/entities/*.js',
+  ],
 });
 
 export default appDataSource;

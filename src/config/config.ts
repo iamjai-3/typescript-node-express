@@ -12,7 +12,10 @@ const SERVER_TOKEN_EXPIRETIME: number =
 const SERVER_TOKEN_ISSUER = process.env.SERVER_TOKEN_ISSUER || 'sudoIssuer';
 const SERVER_TOKEN_SECRET = process.env.SERVER_TOKEN_SECRET || 'sudoEncrypted';
 
+const STAGE = process.env.STAGE || 'development';
+
 export const config = {
+  stage: STAGE,
   mongo: {
     url: MONGO_URL,
   },

@@ -18,4 +18,4 @@ RUN npm run build
 # Expose the API Port
 EXPOSE 5000
 
-CMD ["node", "build/server.js"]
+CMD ["node", "build/src/server.js"]
