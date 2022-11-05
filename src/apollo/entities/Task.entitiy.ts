@@ -14,7 +14,7 @@ import {
 export class Task extends BaseEntity {
   @ObjectIdColumn()
   @Field(() => ID)
-  id: ObjectId;
+  _id: ObjectId;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field({ nullable: true })

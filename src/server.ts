@@ -29,19 +29,18 @@ mongoose
     Logging.error(error);
   });
 
+/** Initializing Mongo TypeORM */
+appDataSource
+  .initialize()
+  .then(() => {
+    Logging.info('<--Mongo TypeORM Initialized-->');
+  })
+  .catch((err) => {
+    Logging.error(`<--Error Initializing Mongo TypeORM--> :${err}`);
+  });
+
 /** Only start the server of Mongo connects */
-
 const StartServer = async () => {
-  /** Initializing Mongo TypeORM */
-  appDataSource
-    .initialize()
-    .then(() => {
-      Logging.info('<--Mongo TypeORM Initialized-->');
-    })
-    .catch((err) => {
-      Logging.error(`<--Error Initializing Mongo TypeORM--> :${err}`);
-    });
-
   /** Apollo Server Configurations */
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
