@@ -47,7 +47,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
     .exec()
     .then((user) => {
       if (user.length !== 1) {
-        return res.status(401).json({ message: 'Unauthorized' });
+        return res.status(401).json({ message: 'User Not Found' });
       }
       //? Checking password match
       bcryptjs.compare(password, user[0].password, (error, result) => {
