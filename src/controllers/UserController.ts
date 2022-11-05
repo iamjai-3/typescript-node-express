@@ -55,7 +55,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
           Logging.error(
             `[${NAMESPACE}] --  ${error.message} -  Error: ${error}`
           );
-          return res.status(401).json({ message: 'Unauthorized' });
+          return res.status(401).json({ message: 'Wrong Credentials' });
         } else if (result) {
           signJWT(user[0], (_error, token) => {
             if (_error) {
