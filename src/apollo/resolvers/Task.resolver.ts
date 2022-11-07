@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 export class TaskResolver {
   @Query(() => String)
   healthCheck(): string {
-    return 'GraphQL Testing !!!';
+    return 'Task GraphQL API Testing !!!';
   }
 
   //? Fetch all Tasks

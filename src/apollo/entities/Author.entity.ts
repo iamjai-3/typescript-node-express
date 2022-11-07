@@ -11,7 +11,7 @@ import {
 
 @Entity()
 @ObjectType()
-export class Task extends BaseEntity {
+export class Author extends BaseEntity {
   @ObjectIdColumn()
   @Field(() => ID)
   _id: ObjectId;
@@ -19,10 +19,6 @@ export class Task extends BaseEntity {
   @Column()
   @Field(() => String)
   title: string;
-
-  @Column()
-  @Field(() => Boolean)
-  isCompleted: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field({ nullable: true })

@@ -11,18 +11,18 @@ import {
 
 @Entity()
 @ObjectType()
-export class Task extends BaseEntity {
+export class User extends BaseEntity {
   @ObjectIdColumn()
   @Field(() => ID)
   _id: ObjectId;
 
   @Column()
   @Field(() => String)
-  title: string;
+  username: string;
 
   @Column()
-  @Field(() => Boolean)
-  isCompleted: boolean;
+  @Field(() => String)
+  password: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field({ nullable: true })

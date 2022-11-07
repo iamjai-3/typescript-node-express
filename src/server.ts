@@ -12,6 +12,7 @@ import { buildSchema } from 'type-graphql';
 import { TaskResolver } from './apollo/resolvers/Task.resolver';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import appDataSource from './apollo/AppDataSource';
+import { AuthorResolver } from './apollo/resolvers/Author.resolver';
 
 const app: Express = express();
 
@@ -44,7 +45,7 @@ const StartServer = async () => {
   /** Apollo Server Configurations */
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [TaskResolver],
+      resolvers: [TaskResolver, AuthorResolver],
       validate: false,
     }),
     introspection: true,
